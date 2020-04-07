@@ -9,7 +9,7 @@ namespace ArenaExpansion {
         private Agent player = Agent.Main;
         private Settlement _settlement;
         public bool MWAXLoadoutSelect { get; set; }
-        public bool MWAXWeaponsSwapped { get; private set; }
+        public bool MWAXWeaponsSwapped { get; set; }
         public int MWAXLoadout { get; set; }
 
         public override void AfterStart() {
