@@ -14,10 +14,12 @@ namespace ArenaExpansion {
         CampaignGameStarter campaignGame;
         List<CultureObject> visitedCultures = new List<CultureObject>();
         int previousLoadout = 0;
+        private bool _enteredFromMenu = false;
 
         public override void RegisterEvents() {
             CampaignEvents.SettlementEntered.AddNonSerializedListener((object)this, new Action<MobileParty, Settlement, Hero>(this.OnSettlementEntered));
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener((object)this, new Action<CampaignGameStarter>(this.OnSessionLaunched));
+            CampaignEvents.MissionStarted.AddNonSerializedListener((object)this, new Action<IMission>(this.AfterMissionStarted));
         }
 
         public override void SyncData(IDataStore dataStore) {
@@ -28,7 +30,8 @@ namespace ArenaExpansion {
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter) {
             this.campaignGame = campaignGameStarter;
             this.AddPreDialogues(campaignGameStarter);
-            
+            this.AddGameMenus(campaignGameStarter);
+
             if (Settlement.CurrentSettlement != null && Settlement.CurrentSettlement.IsTown) {
                 this.AddLoadoutDialogues(this.campaignGame, Settlement.CurrentSettlement);
             }
@@ -40,6 +43,17 @@ namespace ArenaExpansion {
             this.AddLoadoutDialogues(this.campaignGame, settlement);
         }
 
+        private void AfterMissionStarted(IMission mission) {
+            if (_enteredFromMenu) {
+                Mission.Current.GetMissionBehaviour<MWAXArenaWeaponSwapLogic>().MWAXEnteredFromMenu = true;
+                this._enteredFromMenu = false;
+            }
+        }
+
+        protected void AddGameMenus (CampaignGameStarter campaignGameStarter) {
+            campaignGameStarter.AddGameMenuOption("town_arena", "mwax_mno_weapons_list", "{=mwax_arena_5}Choose weapon", new GameMenuOption.OnConditionDelegate(this.game_menu_enter_practice_fight_on_condition), new GameMenuOption.OnConsequenceDelegate(this.MWAX_game_menu_choose_weapon), false, 2, false);
+        }
+
         protected void AddPreDialogues(CampaignGameStarter campaignGameStarter) {
             // Pre-weapons list
             campaignGameStarter.AddPlayerLine("mwax_arena_choose_weapon", "arena_master_enter_practice_fight_confirm", "mwax_arena_weapons_list", "{=mwax_arena_1}I'll choose my gear.", (ConversationSentence.OnConditionDelegate)null, (ConversationSentence.OnConsequenceDelegate)null, 200, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
@@ -49,6 +63,8 @@ namespace ArenaExpansion {
             campaignGameStarter.AddPlayerLine("mwax_arena_rematch_previous", "arena_master_post_practice_fight_talk", "close_window", "{=mwax_arena_3}Yeah. I'll take my previous loadout.", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_post_fight), new ConversationSentence.OnConsequenceDelegate(this.MWAX_conversation_join_arena_with_previous_loadout), 200, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
             campaignGameStarter.AddPlayerLine("mwax_arena_rematch_new", "arena_master_post_practice_fight_talk", "mwax_arena_weapons_list", "{=mwax_arena_4}Sure. I'll take a new loadout.", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_post_fight), (ConversationSentence.OnConsequenceDelegate)null, 200, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
 
+            // Entered from menu weapons list
+            //campaignGameStarter.AddDialogLine("mwax_arena_entered_from_menu", "start", "mwax_arena_weapons_list", "{=mwax_arena_2}Alright, which weapon are you taking?", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_choose_weapon_condition), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null);
         }
 
         protected void AddLoadoutDialogues(CampaignGameStarter campaignGameStarter, Settlement settlement) {
@@ -78,10 +94,22 @@ namespace ArenaExpansion {
 
                 visitedCultures.Add(settlement.Culture);
 
+                // Menu dialogue
+                //campaignGameStarter.AddDialogLine("mwax_arena_entered_from_menu", "start", "mwax_arena_weapons_list", "{=mwax_arena_2}Alright, which weapon are you taking?", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_choose_weapon_condition), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null);
 
                 // Return
                 campaignGameStarter.AddPlayerLine("mwax_arena_return", "mwax_arena_weapons_list", "arena_master_enter_practice_fight", "{=mwax_arena_5}Actually, nevermind.", new ConversationSentence.OnConditionDelegate(() => this.MWAX_conversation_culture_match(settlement.Culture)), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
             }
+        }
+
+        private static void OpenMissionWithSettingPreviousLocation(
+      string previousLocationId,
+      string missionLocationId) {
+            Campaign.Current.GameMenuManager.NextLocation = LocationComplex.Current.GetLocationWithId(missionLocationId);
+            Campaign.Current.GameMenuManager.PreviousLocation = LocationComplex.Current.GetLocationWithId(previousLocationId);
+            PlayerEncounter.LocationEncounter.CreateAndOpenMissionController(Campaign.Current.GameMenuManager.NextLocation, (Location)null, (CharacterObject)null, (string)null);
+            Campaign.Current.GameMenuManager.NextLocation = (Location)null;
+            Campaign.Current.GameMenuManager.PreviousLocation = (Location)null;
         }
 
         private bool MWAX_conversation_culture_match(CultureObject culture) {
@@ -95,6 +123,11 @@ namespace ArenaExpansion {
         private bool MWAX_conversation_post_fight() {
             Mission.Current.GetMissionBehaviour<MWAXArenaWeaponSwapLogic>().MWAXLoadoutSelect = false;
             Mission.Current.GetMissionBehaviour<MWAXArenaWeaponSwapLogic>().MWAXWeaponsSwapped = false;
+            return true;
+        }
+
+        private bool MWAX_conversation_choose_weapon_condition() {
+            InformationManager.DisplayMessage(new InformationMessage("[MWAX] EnteredFromMenu dialogue: " + Mission.Current.GetMissionBehaviour<MWAXArenaWeaponSwapLogic>().MWAXEnteredFromMenu, Color.FromUint(14703633U)));
             return true;
         }
 
@@ -112,6 +145,37 @@ namespace ArenaExpansion {
         private static void StartPlayerPracticeAfterConversationEnd() {
             Mission.Current.SetMissionMode(MissionMode.Battle, false);
             Mission.Current.GetMissionBehaviour<ArenaPracticeFightMissionController>().StartPlayerPractice();
+        }
+
+        private void MWAX_game_menu_choose_weapon(MenuCallbackArgs args) {
+            MWAXArenaMaster.OpenMissionWithSettingPreviousLocation("center", "arena");
+            this._enteredFromMenu = true;
+        }
+
+        private bool game_menu_enter_practice_fight_on_condition(MenuCallbackArgs args) {
+            Settlement currentSettlement = Settlement.CurrentSettlement;
+            //TournamentGame tournamentGame = Campaign.Current.TournamentManager.GetTournamentGame(Settlement.CurrentSettlement.Town);
+            args.optionLeaveType = GameMenuOption.LeaveType.HostileAction;
+            if (Hero.MainHero.IsWounded && Campaign.Current.IsMainHeroDisguised) {
+                args.Tooltip = new TextObject("{=DqZtRBXR}You are wounded and in disguise.", (Dictionary<string, TextObject>)null);
+                args.IsEnabled = false;
+                return true;
+            }
+            if (Hero.MainHero.IsWounded) {
+                args.Tooltip = new TextObject("{=yNMrF2QF}You are wounded", (Dictionary<string, TextObject>)null);
+                args.IsEnabled = false;
+                return true;
+            }
+            if (Campaign.Current.IsMainHeroDisguised) {
+                args.Tooltip = new TextObject("{=jcEoUPCB}You are in disguise.", (Dictionary<string, TextObject>)null);
+                args.IsEnabled = false;
+                return true;
+            }
+            if (!currentSettlement.HasTournament)
+                return true;
+            args.Tooltip = new TextObject("{=NESB0CVc}There is no practice fight because of the Tournament.", (Dictionary<string, TextObject>)null);
+            args.IsEnabled = false;
+            return true;
         }
     }
 }

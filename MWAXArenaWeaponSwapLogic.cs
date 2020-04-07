@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
@@ -10,6 +11,7 @@ namespace ArenaExpansion {
         private Settlement _settlement;
         public bool MWAXLoadoutSelect { get; set; }
         public bool MWAXWeaponsSwapped { get; set; }
+        public bool MWAXEnteredFromMenu { get; set; }
         public int MWAXLoadout { get; set; }
 
         public override void AfterStart() {
@@ -22,6 +24,11 @@ namespace ArenaExpansion {
 
         public override void OnMissionTick(float dt) {
             base.OnMissionTick(dt);
+
+            if (this.MWAXEnteredFromMenu) {
+                MissionConversationHandler.Current.StartConversation(this.Mission.Agents.FirstOrDefault<Agent>((Func<Agent, bool>)(x => x.Character != null && ((CharacterObject)x.Character).Occupation == Occupation.ArenaMaster)), true, false);
+                this.MWAXEnteredFromMenu = false;
+            }
 
             if (!this.MWAXLoadoutSelect)
                 return;
