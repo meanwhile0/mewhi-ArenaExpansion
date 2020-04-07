@@ -1,6 +1,8 @@
-﻿using TaleWorlds.CampaignSystem;
+﻿using System;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.Library;
 using SandBox;
 
 namespace ArenaExpansion {
@@ -14,7 +16,7 @@ namespace ArenaExpansion {
             base.OnGameInitializationFinished(game);
 
             //InformationManager.ShowInquiry(new InquiryData("MWAX", "Arena Expansion Active", true, false, "Okay", "", (Action)null, (Action)null, ""), false);
-            InformationManager.DisplayMessage(new InformationMessage("[MWAX] Arena Expansion Active"));
+            InformationManager.DisplayMessage(new InformationMessage("[MWAX] Arena Expansion Active", Color.FromUint(3764130048U)));
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject) {
