@@ -29,8 +29,7 @@ namespace ArenaExpansion {
             if (this.MWAXWeaponsSwapped)
                 return;
 
-            if (this.player == null)
-                this.player = Agent.Main;
+            this.player = Agent.Main;
 
             ArenaPracticeFightMissionController missionBehaviour = Mission.Current.GetMissionBehaviour<ArenaPracticeFightMissionController>();
 
