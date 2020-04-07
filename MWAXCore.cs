@@ -10,6 +10,7 @@ namespace ArenaExpansion {
 
         protected override void OnSubModuleLoad() {
             base.OnSubModuleLoad();
+            MWAXConfig config = new MWAXConfig();
         }
 
         public override void OnGameInitializationFinished(Game game) {

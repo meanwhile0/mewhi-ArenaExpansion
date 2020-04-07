@@ -5,7 +5,6 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
-using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using SandBox;
 
@@ -62,15 +61,13 @@ namespace ArenaExpansion {
             // Post-match list
             campaignGameStarter.AddPlayerLine("mwax_arena_rematch_previous", "arena_master_post_practice_fight_talk", "close_window", "{=mwax_arena_3}Yeah. I'll take my previous loadout.", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_post_fight), new ConversationSentence.OnConsequenceDelegate(this.MWAX_conversation_join_arena_with_previous_loadout), 200, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
             campaignGameStarter.AddPlayerLine("mwax_arena_rematch_new", "arena_master_post_practice_fight_talk", "mwax_arena_weapons_list", "{=mwax_arena_4}Sure. I'll take a new loadout.", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_post_fight), (ConversationSentence.OnConsequenceDelegate)null, 200, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
-
-            // Entered from menu weapons list
-            //campaignGameStarter.AddDialogLine("mwax_arena_entered_from_menu", "start", "mwax_arena_weapons_list", "{=mwax_arena_2}Alright, which weapon are you taking?", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_choose_weapon_condition), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null);
         }
 
         protected void AddLoadoutDialogues(CampaignGameStarter campaignGameStarter, Settlement settlement) {
             // Populate weapons list
             if (!visitedCultures.Contains(settlement.Culture)) {
-                CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_1_" + settlement.Culture.StringId);
+                MWAXConfig config = new MWAXConfig();
+                CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_" + config.MWAXWeaponStage() + "_" + settlement.Culture.StringId);
 
                 for (int i = 0; i < characterObject.BattleEquipments.Count<Equipment>(); i++) {
                     string[] dialogueIdArr = new string[4];
@@ -93,9 +90,6 @@ namespace ArenaExpansion {
                 }
 
                 visitedCultures.Add(settlement.Culture);
-
-                // Menu dialogue
-                //campaignGameStarter.AddDialogLine("mwax_arena_entered_from_menu", "start", "mwax_arena_weapons_list", "{=mwax_arena_2}Alright, which weapon are you taking?", new ConversationSentence.OnConditionDelegate(this.MWAX_conversation_choose_weapon_condition), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null);
 
                 // Return
                 campaignGameStarter.AddPlayerLine("mwax_arena_return", "mwax_arena_weapons_list", "arena_master_enter_practice_fight", "{=mwax_arena_5}Actually, nevermind.", new ConversationSentence.OnConditionDelegate(() => this.MWAX_conversation_culture_match(settlement.Culture)), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
@@ -126,11 +120,6 @@ namespace ArenaExpansion {
             return true;
         }
 
-        private bool MWAX_conversation_choose_weapon_condition() {
-            InformationManager.DisplayMessage(new InformationMessage("[MWAX] EnteredFromMenu dialogue: " + Mission.Current.GetMissionBehaviour<MWAXArenaWeaponSwapLogic>().MWAXEnteredFromMenu, Color.FromUint(14703633U)));
-            return true;
-        }
-
         public void MWAX_conversation_join_arena_with_previous_loadout() {
             this.MWAX_conversation_join_arena_with_selected_loadout(this.previousLoadout);
         }
@@ -154,7 +143,7 @@ namespace ArenaExpansion {
 
         private bool game_menu_enter_practice_fight_on_condition(MenuCallbackArgs args) {
             Settlement currentSettlement = Settlement.CurrentSettlement;
-            //TournamentGame tournamentGame = Campaign.Current.TournamentManager.GetTournamentGame(Settlement.CurrentSettlement.Town);
+
             args.optionLeaveType = GameMenuOption.LeaveType.HostileAction;
             if (Hero.MainHero.IsWounded && Campaign.Current.IsMainHeroDisguised) {
                 args.Tooltip = new TextObject("{=DqZtRBXR}You are wounded and in disguise.", (Dictionary<string, TextObject>)null);

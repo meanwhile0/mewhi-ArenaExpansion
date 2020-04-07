@@ -47,7 +47,8 @@ namespace ArenaExpansion {
         }
 
         private void SwapEquipment(Agent agent, int loadout) {
-            CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_1_" + this._settlement.MapFaction.Culture.StringId) ?? Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_1_empire");
+            MWAXConfig config = new MWAXConfig();
+            CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_" + config.MWAXWeaponStage() + "_" + this._settlement.MapFaction.Culture.StringId) ?? Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_1_empire");
 
             for (int i = 0; i < 4; i++) {
                 EquipmentElement equipmentFromSlot = characterObject.BattleEquipments.ToList<Equipment>()[loadout].GetEquipmentFromSlot((EquipmentIndex)i);

@@ -89,6 +89,7 @@
     <Compile Include="MWAXArenaMaster.cs" />
     <Compile Include="MWAXArenaMasterDialoguePatch.cs" />
     <Compile Include="MWAXArenaWeaponSwapLogic.cs" />
+    <Compile Include="MWAXConfig.cs" />
     <Compile Include="MWAXCore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
