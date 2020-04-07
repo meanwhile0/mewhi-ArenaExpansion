@@ -16,7 +16,7 @@ namespace ArenaExpansion {
             base.OnGameInitializationFinished(game);
 
             //InformationManager.ShowInquiry(new InquiryData("MWAX", "Arena Expansion Active", true, false, "Okay", "", (Action)null, (Action)null, ""), false);
-            InformationManager.DisplayMessage(new InformationMessage("[MWAX] Arena Expansion Active", Color.FromUint(3764130048U)));
+            InformationManager.DisplayMessage(new InformationMessage("[MWAX] Arena Expansion Active", Color.FromUint(14703633U)));
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject) {
