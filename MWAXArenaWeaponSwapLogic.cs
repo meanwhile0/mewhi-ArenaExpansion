@@ -49,9 +49,10 @@ namespace ArenaExpansion {
                 if (equipmentFromSlot.Item != null) {
                     MissionWeapon missionWeapon = new MissionWeapon(equipmentFromSlot.Item, agent.Origin?.Banner);
                     agent.EquipWeaponWithNewEntity((EquipmentIndex)i, ref missionWeapon);
-                    agent.WieldInitialWeapons();
                 }
             }
+
+            agent.WieldInitialWeapons();
         }
     }
 }
