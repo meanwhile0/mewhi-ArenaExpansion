@@ -66,7 +66,7 @@ namespace ArenaExpansion {
 
         protected void AddLoadoutDialogues(CampaignGameStarter campaignGameStarter, Settlement settlement) {
             // Populate weapons list
-            if (!visitedCultures.Contains(settlement.Culture)) {
+            if (!visitedCultures.Contains(settlement.MapFaction.Culture)) {
                 MWAXConfig config = new MWAXConfig();
                 CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_" + config.MWAXWeaponStage() + "_" + settlement.Culture.StringId);
 
@@ -87,13 +87,13 @@ namespace ArenaExpansion {
                     dialogueId = string.Join("_", dialogueIdArr.Where(s => !string.IsNullOrEmpty(s)));
                     dialogueText = string.Join(", ", dialogueTextArr.Where(s => !string.IsNullOrEmpty(s)));
 
-                    campaignGameStarter.AddPlayerLine(dialogueId, "mwax_arena_weapons_list", "close_window", dialogueText, new ConversationSentence.OnConditionDelegate(() => this.MWAX_conversation_culture_match(settlement.Culture)), new ConversationSentence.OnConsequenceDelegate(() => this.MWAX_conversation_join_arena_with_selected_loadout(loadout)), 100, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
+                    campaignGameStarter.AddPlayerLine(dialogueId, "mwax_arena_weapons_list", "close_window", dialogueText, new ConversationSentence.OnConditionDelegate(() => this.MWAX_conversation_culture_match(settlement.MapFaction.Culture)), new ConversationSentence.OnConsequenceDelegate(() => this.MWAX_conversation_join_arena_with_selected_loadout(loadout)), 100, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
                 }
 
-                visitedCultures.Add(settlement.Culture);
+                visitedCultures.Add(settlement.MapFaction.Culture);
 
                 // Return
-                campaignGameStarter.AddPlayerLine("mwax_arena_return", "mwax_arena_weapons_list", "arena_master_enter_practice_fight", "{=mwax_arena_5}Actually, nevermind.", new ConversationSentence.OnConditionDelegate(() => this.MWAX_conversation_culture_match(settlement.Culture)), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
+                campaignGameStarter.AddPlayerLine("mwax_arena_return", "mwax_arena_weapons_list", "arena_master_enter_practice_fight", "{=mwax_arena_5}Actually, nevermind.", new ConversationSentence.OnConditionDelegate(() => this.MWAX_conversation_culture_match(settlement.MapFaction.Culture)), (ConversationSentence.OnConsequenceDelegate)null, 100, (ConversationSentence.OnClickableConditionDelegate)null, (ConversationSentence.OnPersuasionOptionDelegate)null);
             }
         }
 
