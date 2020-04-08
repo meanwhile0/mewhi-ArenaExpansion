@@ -14,6 +14,7 @@ namespace ArenaExpansion {
         List<CultureObject> visitedCultures = new List<CultureObject>();
         int previousLoadout = 0;
         private bool _enteredFromMenu = false;
+        private bool _knowTournaments;
 
         public override void RegisterEvents() {
             CampaignEvents.SettlementEntered.AddNonSerializedListener((object)this, new Action<MobileParty, Settlement, Hero>(this.OnSettlementEntered));
@@ -22,7 +23,7 @@ namespace ArenaExpansion {
         }
 
         public override void SyncData(IDataStore dataStore) {
-            // nothing needs to be done
+            dataStore.SyncData<bool>("_knowTournaments", ref this._knowTournaments);
         }
 
 
@@ -145,6 +146,11 @@ namespace ArenaExpansion {
             Settlement currentSettlement = Settlement.CurrentSettlement;
 
             args.optionLeaveType = GameMenuOption.LeaveType.HostileAction;
+            if (!this._knowTournaments) {
+                args.Tooltip = new TextObject("{=Sph9Nliz}You need to learn more about the arena by talking with the arena master.", (Dictionary<string, TextObject>)null);
+                args.IsEnabled = false;
+                return true;
+            }
             if (Hero.MainHero.IsWounded && Campaign.Current.IsMainHeroDisguised) {
                 args.Tooltip = new TextObject("{=DqZtRBXR}You are wounded and in disguise.", (Dictionary<string, TextObject>)null);
                 args.IsEnabled = false;
