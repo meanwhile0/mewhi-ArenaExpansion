@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.Localization;
 using SandBox;
+using SandBox.Source.Towns;
 
 namespace ArenaExpansion {
     public class MWAXArenaMaster : CampaignBehaviorBase {
@@ -14,7 +16,6 @@ namespace ArenaExpansion {
         List<CultureObject> visitedCultures = new List<CultureObject>();
         int previousLoadout = 0;
         private bool _enteredFromMenu = false;
-        private bool _knowTournaments;
 
         public override void RegisterEvents() {
             CampaignEvents.SettlementEntered.AddNonSerializedListener((object)this, new Action<MobileParty, Settlement, Hero>(this.OnSettlementEntered));
@@ -23,9 +24,8 @@ namespace ArenaExpansion {
         }
 
         public override void SyncData(IDataStore dataStore) {
-            dataStore.SyncData<bool>("_knowTournaments", ref this._knowTournaments);
+            // nothing needs to be done
         }
-
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter) {
             this.campaignGame = campaignGameStarter;
@@ -50,7 +50,7 @@ namespace ArenaExpansion {
             }
         }
 
-        protected void AddGameMenus (CampaignGameStarter campaignGameStarter) {
+        protected void AddGameMenus(CampaignGameStarter campaignGameStarter) {
             campaignGameStarter.AddGameMenuOption("town_arena", "mwax_mno_weapons_list", "{=mwax_arena_5}Choose weapon", new GameMenuOption.OnConditionDelegate(this.game_menu_enter_practice_fight_on_condition), new GameMenuOption.OnConsequenceDelegate(this.MWAX_game_menu_choose_weapon), false, 2, false);
         }
 
@@ -145,8 +145,11 @@ namespace ArenaExpansion {
         private bool game_menu_enter_practice_fight_on_condition(MenuCallbackArgs args) {
             Settlement currentSettlement = Settlement.CurrentSettlement;
 
+            ArenaMaster am = (ArenaMaster)Campaign.Current.GetCampaignBehavior<ArenaMaster>();
+            FieldInfo knowTournaments = typeof(ArenaMaster).GetField("_knowTournaments", BindingFlags.NonPublic | BindingFlags.Instance);
+
             args.optionLeaveType = GameMenuOption.LeaveType.HostileAction;
-            if (!this._knowTournaments) {
+            if (!(bool)knowTournaments.GetValue(am) || knowTournaments.GetValue(am) == null) {
                 args.Tooltip = new TextObject("{=Sph9Nliz}You need to learn more about the arena by talking with the arena master.", (Dictionary<string, TextObject>)null);
                 args.IsEnabled = false;
                 return true;
