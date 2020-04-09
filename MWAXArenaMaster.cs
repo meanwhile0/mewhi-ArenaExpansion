@@ -68,7 +68,7 @@ namespace ArenaExpansion {
             // Populate weapons list
             if (!visitedCultures.Contains(settlement.MapFaction.Culture)) {
                 MWAXConfig config = new MWAXConfig();
-                CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_" + config.MWAXWeaponStage() + "_" + settlement.Culture.StringId);
+                CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_" + config.MWAXWeaponStage() + "_" + settlement.MapFaction.Culture.StringId);
 
                 for (int i = 0; i < characterObject.BattleEquipments.Count<Equipment>(); i++) {
                     string[] dialogueIdArr = new string[4];
