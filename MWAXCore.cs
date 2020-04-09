@@ -28,8 +28,6 @@ namespace ArenaExpansion {
 
             CampaignGameStarter gameInitializer = (CampaignGameStarter)gameStarterObject;
             this.AddBehaviours(gameInitializer);
-
-            new Harmony("com.mewhi.arenaexpansion").PatchAll();
         }
 
         public override void OnCampaignStart(Game game, object starterObject) {

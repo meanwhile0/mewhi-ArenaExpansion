@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +8,7 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.Localization;
+using TaleWorlds.Library;
 using SandBox;
 using SandBox.Source.Towns;
 
@@ -31,6 +33,7 @@ namespace ArenaExpansion {
             this.campaignGame = campaignGameStarter;
             this.AddPreDialogues(campaignGameStarter);
             this.AddGameMenus(campaignGameStarter);
+            new Harmony("com.mewhi.arenaexpansion").PatchAll();
 
             if (Settlement.CurrentSettlement != null && Settlement.CurrentSettlement.IsTown) {
                 this.AddLoadoutDialogues(this.campaignGame, Settlement.CurrentSettlement);
