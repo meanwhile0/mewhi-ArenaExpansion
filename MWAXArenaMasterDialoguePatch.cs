@@ -12,6 +12,9 @@ namespace ArenaExpansion {
         }
 
         private static bool MWAX_conversation_choose_weapon_condition() {
+            if (Mission.Current.GetMissionBehaviour<MWAXArenaWeaponSwapLogic>() == null)
+                return false;
+
             return Mission.Current.GetMissionBehaviour<MWAXArenaWeaponSwapLogic>().MWAXEnteredFromMenu;
         }
     }
