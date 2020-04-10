@@ -40,14 +40,14 @@ namespace ArenaExpansion {
 
         public override void OnMissionBehaviourInitialize(Mission mission) {
             base.OnMissionBehaviourInitialize(mission);
-            this.AddMissionBehaviourTemp(mission);
+            this.AddMissionBehaviours(mission);
         }
 
         private void AddBehaviours(CampaignGameStarter gameInitializer) {
             gameInitializer.AddBehavior(new MWAXArenaMaster());
         }
 
-        private void AddMissionBehaviourTemp(Mission mission) {
+        private void AddMissionBehaviours(Mission mission) {
             if (mission.HasMissionBehaviour<MWAXArenaWeaponSwapLogic>() || !mission.HasMissionBehaviour<ArenaPracticeFightMissionController>())
                 return;
 
