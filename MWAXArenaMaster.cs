@@ -22,6 +22,7 @@ namespace ArenaExpansion {
         public override void RegisterEvents() {
             CampaignEvents.SettlementEntered.AddNonSerializedListener((object)this, new Action<MobileParty, Settlement, Hero>(this.OnSettlementEntered));
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener((object)this, new Action<CampaignGameStarter>(this.OnSessionLaunched));
+            CampaignEvents.OnGameLoadedEvent.AddNonSerializedListener((object)this, new Action<CampaignGameStarter>(this.OnGameLoaded));
             CampaignEvents.MissionStarted.AddNonSerializedListener((object)this, new Action<IMission>(this.AfterMissionStarted));
         }
 
@@ -33,17 +34,20 @@ namespace ArenaExpansion {
             this.campaignGame = campaignGameStarter;
             this.AddPreDialogues(campaignGameStarter);
             this.AddGameMenus(campaignGameStarter);
-            new Harmony("com.mewhi.arenaexpansion").PatchAll();
-
-            if (Settlement.CurrentSettlement != null && Settlement.CurrentSettlement.IsTown) {
-                this.AddLoadoutDialogues(this.campaignGame, Settlement.CurrentSettlement);
-            }
+            
         }
 
         public void OnSettlementEntered(MobileParty mobileParty, Settlement settlement, Hero hero) {
             if (mobileParty != MobileParty.MainParty || !settlement.IsTown)
                 return;
             this.AddLoadoutDialogues(this.campaignGame, settlement);
+        }
+
+        public void OnGameLoaded(CampaignGameStarter campaignGameStarter) {
+            new Harmony("com.mewhi.arenaexpansion").PatchAll();
+            if (Settlement.CurrentSettlement == null || !Settlement.CurrentSettlement.IsTown)
+                return;
+            this.AddLoadoutDialogues(campaignGameStarter, Settlement.CurrentSettlement);
         }
 
         private void AfterMissionStarted(IMission mission) {
@@ -69,6 +73,7 @@ namespace ArenaExpansion {
 
         protected void AddLoadoutDialogues(CampaignGameStarter campaignGameStarter, Settlement settlement) {
             // Populate weapons list
+
             if (!visitedCultures.Contains(settlement.MapFaction.Culture)) {
                 MWAXConfig config = new MWAXConfig();
                 CharacterObject characterObject = Game.Current.ObjectManager.GetObject<CharacterObject>("weapon_practice_stage_" + config.MWAXWeaponStage() + "_" + settlement.MapFaction.Culture.StringId);
@@ -111,7 +116,7 @@ namespace ArenaExpansion {
         }
 
         private bool MWAX_conversation_culture_match(CultureObject culture) {
-            if (culture.Equals(Settlement.CurrentSettlement.Culture)) {
+            if (culture.Equals(Settlement.CurrentSettlement.MapFaction.Culture)) {
                 return true;
             } else {
                 return false;
