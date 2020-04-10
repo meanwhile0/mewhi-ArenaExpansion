@@ -8,7 +8,6 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.Localization;
-using TaleWorlds.Library;
 using SandBox;
 using SandBox.Source.Towns;
 
@@ -40,13 +39,16 @@ namespace ArenaExpansion {
         public void OnSettlementEntered(MobileParty mobileParty, Settlement settlement, Hero hero) {
             if (mobileParty != MobileParty.MainParty || !settlement.IsTown)
                 return;
+
             this.AddLoadoutDialogues(this.campaignGame, settlement);
         }
 
         public void OnGameLoaded(CampaignGameStarter campaignGameStarter) {
             new Harmony("com.mewhi.arenaexpansion").PatchAll();
+
             if (Settlement.CurrentSettlement == null || !Settlement.CurrentSettlement.IsTown)
                 return;
+
             this.AddLoadoutDialogues(campaignGameStarter, Settlement.CurrentSettlement);
         }
 

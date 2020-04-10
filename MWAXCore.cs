@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using TaleWorlds.CampaignSystem;
+﻿using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.Library;
@@ -10,13 +9,11 @@ namespace ArenaExpansion {
 
         protected override void OnSubModuleLoad() {
             base.OnSubModuleLoad();
-            MWAXConfig config = new MWAXConfig();
         }
 
         public override void OnGameInitializationFinished(Game game) {
             base.OnGameInitializationFinished(game);
 
-            //InformationManager.ShowInquiry(new InquiryData("MWAX", "Arena Expansion Active", true, false, "Okay", "", (Action)null, (Action)null, ""), false);
             InformationManager.DisplayMessage(new InformationMessage("[MWAX] Arena Expansion Active", Color.FromUint(14703633U)));
         }
 
@@ -40,6 +37,7 @@ namespace ArenaExpansion {
 
         public override void OnMissionBehaviourInitialize(Mission mission) {
             base.OnMissionBehaviourInitialize(mission);
+
             this.AddMissionBehaviours(mission);
         }
 
