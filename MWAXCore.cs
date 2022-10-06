@@ -3,6 +3,7 @@ using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.Library;
 using SandBox;
+using SandBox.Missions.MissionLogics.Arena;
 
 namespace ArenaExpansion {
     public class MWAXCore : MBSubModuleBase {
@@ -35,8 +36,8 @@ namespace ArenaExpansion {
             base.OnGameLoaded(game, initializerObject);
         }
 
-        public override void OnMissionBehaviourInitialize(Mission mission) {
-            base.OnMissionBehaviourInitialize(mission);
+        public override void OnMissionBehaviorInitialize(Mission mission) {
+            base.OnMissionBehaviorInitialize(mission);
 
             this.AddMissionBehaviours(mission);
         }
@@ -46,10 +47,10 @@ namespace ArenaExpansion {
         }
 
         private void AddMissionBehaviours(Mission mission) {
-            if (mission.HasMissionBehaviour<MWAXArenaWeaponSwapLogic>() || !mission.HasMissionBehaviour<ArenaPracticeFightMissionController>())
+            if (mission.HasMissionBehavior<MWAXArenaWeaponSwapLogic>() || !mission.HasMissionBehavior<ArenaPracticeFightMissionController>())
                 return;
 
-            mission.AddMissionBehaviour((MissionBehaviour)new MWAXArenaWeaponSwapLogic());
+            mission.AddMissionBehavior((MissionBehavior)new MWAXArenaWeaponSwapLogic());
         }
     }
 }
