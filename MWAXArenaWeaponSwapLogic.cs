@@ -4,6 +4,11 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 using SandBox;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Encounters;
+using SandBox.Missions.MissionLogics.Arena;
+using TaleWorlds.CampaignSystem.Conversation;
+using SandBox.Conversation;
 
 namespace ArenaExpansion {
     public class MWAXArenaWeaponSwapLogic : MissionLogic {
@@ -24,9 +29,9 @@ namespace ArenaExpansion {
 
         public override void OnMissionTick(float dt) {
             base.OnMissionTick(dt);
-
+            
             if (this.MWAXEnteredFromMenu) {
-                MissionConversationHandler.Current.StartConversation(this.Mission.Agents.FirstOrDefault<Agent>((Func<Agent, bool>)(x => x.Character != null && ((CharacterObject)x.Character).Occupation == Occupation.ArenaMaster)), true, false);
+                ConversationMission.StartConversationWithAgent(this.Mission.Agents.FirstOrDefault<Agent>((Func<Agent, bool>)(x => x.Character != null && ((CharacterObject)x.Character).Occupation == Occupation.ArenaMaster)));
                 this.MWAXEnteredFromMenu = false;
             }
 
@@ -38,7 +43,7 @@ namespace ArenaExpansion {
 
             this.player = Agent.Main;
 
-            ArenaPracticeFightMissionController missionBehaviour = Mission.Current.GetMissionBehaviour<ArenaPracticeFightMissionController>();
+            ArenaPracticeFightMissionController missionBehaviour = Mission.Current.GetMissionBehavior<ArenaPracticeFightMissionController>();
 
             if (this.player != null && missionBehaviour.IsPlayerPracticing) {
                 this.SwapEquipment(this.player, this.MWAXLoadout);
@@ -54,7 +59,7 @@ namespace ArenaExpansion {
                 EquipmentElement equipmentFromSlot = characterObject.BattleEquipments.ToList<Equipment>()[loadout].GetEquipmentFromSlot((EquipmentIndex)i);
                 agent.RemoveEquippedWeapon((EquipmentIndex)i);
                 if (equipmentFromSlot.Item != null) {
-                    MissionWeapon missionWeapon = new MissionWeapon(equipmentFromSlot.Item, agent.Origin?.Banner);
+                    MissionWeapon missionWeapon = new MissionWeapon(equipmentFromSlot.Item, equipmentFromSlot.ItemModifier, agent.Origin?.Banner);
                     agent.EquipWeaponWithNewEntity((EquipmentIndex)i, ref missionWeapon);
                 }
             }
